@@ -5,11 +5,63 @@ import java.util.List;
 /**
  * Sifarişin çatdırılma qiymətinin hesablanması.
  */
+
+
+
 public class DeliveryService {
 
     record Order(String customer, double total, double weightKg, String deliveryType) {
     }
 
+    public interface DeliveryStrategy {
+
+        double price(DeliveryService.Order order);
+
+        int days();
+
+        String label();
+    }
+
+    public class CourierDelivery implements DeliveryStrategy {
+
+        @Override
+        public double price(DeliveryService.Order order) {
+
+            if (order.total() >= 100) {
+                return 0;
+            }
+
+            return 5 + order.weightKg() * 0.5;
+        }
+
+        @Override
+        public int days() {
+            return 2;
+        }
+
+        @Override
+        public String label() {
+            return "Courier";
+        }
+    }
+
+    public class PickupDelivery implements DeliveryStrategy {
+
+        @Override
+        public double price(DeliveryService.Order order) {
+            return 2;
+        }
+
+        @Override
+        public int days() {
+            return 3;
+        }
+
+        @Override
+        public String label() {
+            return "Pickup point";
+        }
+    }
     /*
      * TODO:
      *  1. Yeni çatdırılma növü SAME_DAY: 15 AZN, 0 gün, ad "Same day".
